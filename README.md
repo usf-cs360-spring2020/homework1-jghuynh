@@ -1,11 +1,12 @@
 # README
 
 <https://usf-cs360-spring2020.github.io/template-bulma/>
+<https://usf-cs360-spring2020.github.io/web-jghuynh/>
 
 ![Profile Image](profile.png)
 
-**Name:** Your Name  
-**Email:** <username@dons.usfca.edu>
+**Name:** Justine Huynh
+**Email:** <jghuynh@dons.usfca.edu>
 
 This is a template website using [Bulma](https://bulma.io/), [FontAwesome](https://origin.fontawesome.com/) for icons, and [Github Pages](). Designed to be modified (including this README file).
 
