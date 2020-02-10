@@ -10,7 +10,10 @@
     <!-- Load Bulma from CDN (consider saving it to repository instead) -->
     <!-- https://bulma.io/ -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.8.0/css/bulma.min.css">
+
+    <!-- Just to practice; links to the style.css sheet -->
     <link href = "style.css" rel = "stylesheet" type = "text/css">
+
     <!-- Load Font Awesome 5 (free) icons -->
     <script defer src="https://use.fontawesome.com/releases/v5.3.1/js/all.js"></script>
   </head>
@@ -23,9 +26,9 @@
     <div class="hero-body">
       <div class="container">
         <!-- TODO: Change title -->
-        <h1 class="title">Website Title</h1>
+        <h1 class="title">Data Visualization</h1>
         <!-- TODO: Change subtitle -->
-        <h2 class="subtitle">Website Subtitle</h2>
+        <h2 class="subtitle">Paint The Data</h2>
       </div>
     </div>
   </section>
@@ -112,11 +115,11 @@
       <div class="content">
         <h1 class="title">
           <!-- TODO: Change page title -->
-          Page Title
+          Homework #1
         </h1>
         <p class="subtitle">
           <!-- TODO: Change page subtitle -->
-          Page Subtitle
+          San Francisco Air Traffic Data
         </p>
 
         <p>This would be an excellent place to describe what this page is for, what to find in different sections, describe any motivation or theme behind your visualizations, and so on.</p>
@@ -213,6 +216,11 @@ You can even put code into these pre blocks.
           // Access the Vega view instance (https://vega.github.io/vega/docs/api/view/) as result.view
         }).catch(console.error);
         </script>
+
+
+        <!-- we will place our visualization in this svg using d3.js -->
+        <svg></svg>
+
 
         <h4>Instructions</h4>
 
@@ -389,6 +397,14 @@ You can even put code into these pre blocks.
     }
   });
   </script>
+
+<!-- Finally we can write in D3! -->
+<script src="https://d3js.org/d3.v5.min.js"></script>
+
+<!-- include d3.js modules -->
+<script src="https://d3js.org/d3-array.v2.min.js"></script>
+
+
   <!-- End mobile menu responsiveness -->
   </body>
 
