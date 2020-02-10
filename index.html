@@ -217,9 +217,19 @@ You can even put code into these pre blocks.
         }).catch(console.error);
         </script>
 
+        <!-- include custom javascript -->
+        <script src="count.js"></script>
 
         <!-- we will place our visualization in this svg using d3.js -->
         <svg></svg>
+
+        <!-- Here is out core javascript -->
+        <script type="text/javascript">
+        d3.csv.("Air_Traffic_Passenger_Statistics.csv").then(function(data) {
+          console.log(data);
+        })
+
+        </script>
 
 
         <h4>Instructions</h4>
