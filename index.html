@@ -16,12 +16,22 @@
 
     <!-- Load Font Awesome 5 (free) icons -->
     <script defer src="https://use.fontawesome.com/releases/v5.3.1/js/all.js"></script>
+
+
+
+    <!-- Finally we can write in D3! -->
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+
+    <!-- include d3.js modules -->
+    <script src="https://d3js.org/d3-array.v2.min.js"></script>
+  <!-- Page header -->
+  <!-- https://bulma.io/documentation/layout/hero/ -->
+
+  <script src = "lineGraph.js"></script>
   </head>
 
   <body>
 
-  <!-- Page header -->
-  <!-- https://bulma.io/documentation/layout/hero/ -->
   <section class="hero is-primary is-bold">
     <div class="hero-body">
       <div class="container">
@@ -201,6 +211,10 @@ You can even put code into these pre blocks.
           </a>
         </p>
 
+        <!-- we will place our visualization in this svg using d3.js -->
+        <svg id="line-graph"></svg>
+
+
         <!-- https://github.com/vega/vega-embed#basic-example -->
         <p>It is possible to embed some visualizations directly here too. Here is <a href="https://github.com/vega/vega-embed#basic-example">an example</a> using Vega-Lite:</p>
 
@@ -218,16 +232,83 @@ You can even put code into these pre blocks.
         </script>
 
         <!-- include custom javascript -->
-        <script src="count.js"></script>
-
-        <!-- we will place our visualization in this svg using d3.js -->
-        <svg></svg>
+        <script src="count1.js"></script>
+        <script src = "config1.js"> </script>
 
         <!-- Here is out core javascript -->
         <script type="text/javascript">
-        d3.csv.("Air_Traffic_Passenger_Statistics.csv").then(function(data) {
-          console.log(data);
-        })
+         console.log("Hello!")
+        airData = d3.csv("Air_Traffic_Passenger_Statistics.csv", parseData)
+        .then(function(data) {
+          console.log("Before parsing:");
+          //console.log("Here is airData: ", airData);
+          // parse data
+          var myParsedData = parseData(data)
+          // now graph
+          drawLineGraph(myParsedData);
+          })
+          let parseTime = d3.timeParse("%Y-%m");
+          d.date = formatDate.parse(d.date);
+          console.log("Just tried parsing time");
+
+
+        function parseData(row, index) {
+          //var parseTime = d3.time.format("DATEPARSE('YYYYMM', STR([Activity Period]))")
+          // this will be our converted output row
+          let out = {};
+
+
+          // this will be the values from each yyyy-mm column
+          out.values = [];
+
+          // loop through all of the columns in our original row
+  // depending on column name, perform some sort of conversion
+          for (let col in row) {
+            switch (col) {
+              // these are the text columns that do not need conversion
+              case 'Operating Airline':
+              case 'Operating Airline IATA Code':
+              case 'Published Airline':
+              case 'Published Airline IATA Code':
+              case 'GEO Summary':
+              case 'Geo Region':
+              case 'Activity Type Code':
+              case 'Price Category Code':
+              case 'Terminal':
+              case 'Boarding Area':
+              case 'Count':
+                out[col] = row[col];
+                break;
+
+                // these are the columns that need to be converted to integer
+              case 'Activity Period':
+              case 'Passenger Count':
+              out[col] = parseInt(row[col]);
+              break;
+
+              // these should be our time series values
+            default:
+              // convert column name into the date
+              var date = parseTime(col);
+
+              // convert the value to float
+              var value = parseFloat(row[col]);
+
+              // add them to our values
+              out.values.push({
+                'date': date,
+                'value': value
+              });
+
+            }
+          }
+
+          return out;
+        } // function parseData
+
+        //}
+
+
 
         </script>
 
@@ -408,11 +489,7 @@ You can even put code into these pre blocks.
   });
   </script>
 
-<!-- Finally we can write in D3! -->
-<script src="https://d3js.org/d3.v5.min.js"></script>
 
-<!-- include d3.js modules -->
-<script src="https://d3js.org/d3-array.v2.min.js"></script>
 
 
   <!-- End mobile menu responsiveness -->
