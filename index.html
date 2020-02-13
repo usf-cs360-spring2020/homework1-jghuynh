@@ -237,78 +237,15 @@ You can even put code into these pre blocks.
 
         <!-- Here is out core javascript -->
         <script type="text/javascript">
-         console.log("Hello!")
+         console.log("Right before parsing")
         airData = d3.csv("Air_Traffic_Passenger_Statistics.csv", parseData)
         .then(function(data) {
-          console.log("Before parsing:");
           //console.log("Here is airData: ", airData);
           // parse data
-          var myParsedData = parseData(data)
+          //var myParsedData = parseData(data)
           // now graph
-          drawLineGraph(myParsedData);
-          })
-          let parseTime = d3.timeParse("%Y-%m");
-          d.date = formatDate.parse(d.date);
-          console.log("Just tried parsing time");
-
-
-        function parseData(row, index) {
-          //var parseTime = d3.time.format("DATEPARSE('YYYYMM', STR([Activity Period]))")
-          // this will be our converted output row
-          let out = {};
-
-
-          // this will be the values from each yyyy-mm column
-          out.values = [];
-
-          // loop through all of the columns in our original row
-  // depending on column name, perform some sort of conversion
-          for (let col in row) {
-            switch (col) {
-              // these are the text columns that do not need conversion
-              case 'Operating Airline':
-              case 'Operating Airline IATA Code':
-              case 'Published Airline':
-              case 'Published Airline IATA Code':
-              case 'GEO Summary':
-              case 'Geo Region':
-              case 'Activity Type Code':
-              case 'Price Category Code':
-              case 'Terminal':
-              case 'Boarding Area':
-              case 'Count':
-                out[col] = row[col];
-                break;
-
-                // these are the columns that need to be converted to integer
-              case 'Activity Period':
-              case 'Passenger Count':
-              out[col] = parseInt(row[col]);
-              break;
-
-              // these should be our time series values
-            default:
-              // convert column name into the date
-              var date = parseTime(col);
-
-              // convert the value to float
-              var value = parseFloat(row[col]);
-
-              // add them to our values
-              out.values.push({
-                'date': date,
-                'value': value
-              });
-
-            }
-          }
-
-          return out;
-        } // function parseData
-
-        //}
-
-
+          drawLineGraph(data);
+        });
 
         </script>
 

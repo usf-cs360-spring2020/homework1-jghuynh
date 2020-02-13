@@ -36,3 +36,26 @@ rect.attr('x', 0);
 rect.attr('y', 0);
 rect.attr('width', config.plot.width);
 rect.attr('height', config.plot.height);
+
+// scales for data
+let scale = {};
+
+scale.x = d3.scaleBand();
+scale.x.range([0, config.plot.width]);
+
+scale.y = d3.scaleBand();
+scale.y.range([config.plot.height, 0]);
+
+// https://github.com/d3/d3-scale-chromatic
+scale.color = d3.scaleSequential(d3.interpolateViridis);
+
+let axis = {};  // axes for data
+axis.x = d3.axisBottom(scale.x);
+axis.x.tickPadding(0);
+
+axis.y = d3.axisLeft(scale.y);
+axis.y.tickPadding(0);
+
+// format the tick labels
+axis.x.tickFormat(dateFormatter);
+axis.y.tickFormat(regionFormatter);
