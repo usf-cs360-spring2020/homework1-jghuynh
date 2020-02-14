@@ -212,13 +212,28 @@ airData = d3.csv("Air_Traffic_Passenger_Statistics.csv")
 // axis.x.tickFormat(dateFormatter);
 // axis.y.tickFormat(regionFormatter);
 
+//Using ES6 Map object:
+
+function groupBy(list, keyGetter) {
+    const map = new Map();
+    list.forEach((item) => {
+         const key = keyGetter(item);
+         const collection = map.get(key);
+         if (!collection) {
+             map.set(key, [item]);
+         } else {
+             collection.push(item);
+         }
+    });
+    return map;
+}
 let drawLineGraph = function(data) {
 
   // filtering
   data = data.filter(function(row) {
     //return row[]
     //console.log("row is ", row);
-    
+
     return row["GEO Region"] === "Asia" ||
       row["GEO Region"] === "Europe" ||
       row["GEO Region"] === "Canada" ||
