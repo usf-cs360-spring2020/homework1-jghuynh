@@ -10,8 +10,70 @@ const margin = {
   right: 15
 }
 
+// set up svg
+const svg = d3.select("body").select("svg#lines");
+console.assert(svg.size() == 1);
 
 
+// set svg size
+svg.attr("width", width);
+svg.attr("height", height);
+
+// add plot region
+const plot = svg.append("g").attr("id", "plot");
+
+// this is just so we can see the transform of the plot
+// comment out for final version
+// plot.append("rect").attr("width", 10).attr("height", 10);
+
+// transform region by margin
+plot.attr("transform", translate(margin.left, margin.top));
+
+/*
+ * setup scales with ranges and the domains we set from tableau
+ * defined globally for access within other functions
+ */
+
+const scales = {
+  //x: d3.scaleLinear(),
+  x: d3.scaleTime(),
+  //var x = d3.scaleTime().range([0, width]);
+  y: d3.scaleLinear(),
+  // do not linearly scale radius...
+  // area = pi * r * r, so use sqrt of r!
+  r: d3.scaleSqrt(),
+  fill: //d3.scaleDiverging(d3.interpolateRdYlGn)
+  d3.scaleDiverging(d3.interpolateSpectral)
+  //d3.scaleDiverging(d3.interpolateTurbo) // not exactly diverging
+
+  //d3.scaleDiverging(d3.interpolatePiYG)
+}; // end of const scales
+
+// we are going to hardcode the domains, so we can setup our scales now
+// that is one benefit of prototyping!
+
+// draws the axes for graph
+function drawAxis() {
+  // place the xaxis and yaxis in their own groups
+  const xGroup = svg.append('g').attr('id', 'x-axis').attr('class', 'axis');
+  const yGroup = svg.append('g').attr('id', 'y-axis').attr('class', 'axis');
+
+  // create axis generators
+  const xAxis = d3.axisBottom(scales.x).ticks(20); // refers to x-part of scales
+  const yAxis = d3.axisLeft(scales.y).ticks(20, "s");
+
+  // https://github.com/d3/d3-format#locale_formatPrefix
+  // xAxis.ticks(9, 's').tickSizeOuter(0);
+  // yAxis.ticks(6).tickSizeOuter(0);;
+
+  // shift x axis to correct location
+  xGroup.attr('transform', translate(margin.left, height - margin.bottom));
+  xGroup.call(xAxis);
+
+  // shift y axis to correct location
+  yGroup.attr('transform', translate(margin.left, margin.top))
+  yGroup.call(yAxis);
+}
 
 
 
@@ -22,8 +84,6 @@ console.log(myTime);
 //d.date = formatDate.parse(d.date);
 
 function parseData(row, index) {
-//var parseTime = d3.time.format("DATEPARSE('YYYYMM', STR([Activity Period]))")
-// this will be our converted output row
 let out = {};
 
 
@@ -32,48 +92,59 @@ out.values = [];
 
 // loop through all of the columns in our original row
 // depending on column name, perform some sort of conversion
-for (let col in row) {
-  // row is literally the whole row.
-  // col = the col name
-  // row[col] = value at column = col, row = row
-  switch (col) {
-    // these are the text columns that do not need conversion
-    case 'Activity Period':
-    // convert column name into the date
-      //d['Activity Period'] = +d['Activity Period'];
-      var date = parseTime(row[col]);
-      //console.log("my date ", date);
+// for (let col in row) {
+//   // row is literally the whole row.
+//   // col = the col name
+//   // row[col] = value at column = col, row = row
+//   switch (col) {
+//     // these are the text columns that do not need conversion
+//     case 'Activity Period':
+//     // convert column name into the date
+//       //d['Activity Period'] = +d['Activity Period'];
+//       var date = parseTime(row[col]);
+//       //console.log("my date ", date);
+//
+//       // convert the value to float
+//       var value = parseFloat(row[col]);
+//
+//       // add them to our values
+//       out.values.push({
+//         'date': date,
+//         'value': value
+//       });
+//     case 'Passenger Count':
+//       out[col] = parseInt(row[col]);
+//       break;
+//
+//     default:
+//       out[col] = row[col];
+//       break;
+//
+//       // these are the columns that need to be converted to integer
+//     //case 'Activity Period':
+//   }
+// }
 
-      // convert the value to float
-      var value = parseFloat(row[col]);
+// format the data
 
-      // add them to our values
-      out.values.push({
-        'date': date,
-        'value': value
-      });
-    case 'Passenger Count':
-      out[col] = parseInt(row[col]);
-      break;
 
-    default:
-      out[col] = row[col];
-      break;
-
-      // these are the columns that need to be converted to integer
-    //case 'Activity Period':
-  }
-}
 //console.log(out);
 //console.log(out.values[0]); --> the dates
 return out;
 } // function parseData
-airData = d3.csv("Air_Traffic_Passenger_Statistics.csv", parseData)
+airData = d3.csv("Air_Traffic_Passenger_Statistics.csv")
 .then(function(data) {
   //console.log("Here is airData: ", airData);
   // parse data
   //var myParsedData = parseData(data)
   // now graph
+  // format the data
+  data.forEach(function(d) {
+      d["Activity Period"] = parseTime(d["Activity Period"]);
+      d["Passenger Count"] = +d["Passenger Count"]; // convert into integer
+      //d.close = +d.close;
+  });
+
   drawLineGraph(data);
 });
 //}
@@ -142,18 +213,12 @@ airData = d3.csv("Air_Traffic_Passenger_Statistics.csv", parseData)
 // axis.y.tickFormat(regionFormatter);
 
 let drawLineGraph = function(data) {
-  console.log(data);
-  console.log("Inside drawLineGraph");
-  //console.log(data);
-  //console.log(data[0]); // one specific row in data
-  //console.log(data[0]["values"][0]);
 
-  // I want only the top 5 regions
-  let numRegions = 5;
-
+  // filtering
   data = data.filter(function(row) {
     //return row[]
     //console.log("row is ", row);
+    
     return row["GEO Region"] === "Asia" ||
       row["GEO Region"] === "Europe" ||
       row["GEO Region"] === "Canada" ||
@@ -165,28 +230,80 @@ let drawLineGraph = function(data) {
   }); // data
 
   console.log(data);
+  console.log("Inside drawLineGraph");
+  scales.x.range([0, width - margin.left - margin.right]);
+  //  gives the two ends of your date
+  console.log(typeof(data));
+  console.log(data);
+  scales.x.domain(d3.extent(data, function(d) {
+    console.log(typeof(d));
+    return d["Activity Period"];
+
+  }));
+  //scales.x.domain([2005, 2020]);
+  // the domain of x axis
+
+  scales.y.range([height - margin.top - margin.bottom, 0]);
+  scales.y.domain([0, d3.max(data, function(d) {
+    console.log(d["Passenger Count"]);
+    return d["Passenger Count"];
+  })]);
+  //scales.y.domain([0, 5000000]);
+
+  // note we can chain if we want
+  scales.r.range([1, 20]).domain([0, 9000]);
+
+  scales.fill.domain([-20, 0, 35]);
+
+  drawAxis();
+  //console.log(data);
+  //console.log(data[0]); // one specific row in data
+  //console.log(data[0]["values"][0]);
+
+  // I want only the top 5 regions
+  let numRegions = 5;
+
+
+
+  console.log(data);
   console.log("kept", data.length, "rows");
 
   // so now let's sort
 
   let sortColumn = "Passenger Count";
 
-  data = data.sort(function(a, b) {
-    //console.log(a[sortColumn] - b[sortColumn]);
-    return a[sortColumn] - b[sortColumn];
-  }); // data
+  // data = data.sort(function(a, b) {
+  //   //console.log(a[sortColumn] - b[sortColumn]);
+  //   return a[sortColumn] - b[sortColumn];
+  // }); // data
 
 // well anyways set up scales
 // know: scale.x.domain(dates)
 // scale.y.domain()
 
-  let regions = data.map(row => row["GEO Region"]);
+  //let regions = data.map(row => row["GEO Region"]);
   // so every row is a region
   //console.log(regions);
   //console.log(data);
   //console.log(data.map); does nothing
   // not the best design, but it works and we're moving on
-  let years = data.map(row => parseTime(row["Activity Period"]));
+  //let years = data.map(row => parseTime(row["Activity Period"]));
+
+  // group, with an id  = lines
+  const group = plot.append("g").attr("id", "lines");
+
+  // define the line
+  var valueline = d3.line()
+      .x(function(d) { return scales.x(d["Activity Period"]); })
+      .y(function(d) { return scales.y(d["Passenger Count"]); });
+  const lines = group.selectAll(".line")
+    .data(data)
+    .enter()
+    .append("path")
+    .attr("class", "line")
+    .attr("d", valueline);
+
+
   //console.log("data[0] = ", data[0]);// only 1 row
   // let years = data[0].values.map(value => value.date);
   //console.log(value.date);
@@ -253,8 +370,16 @@ define domain, range
   }
 
   // helper method to make translating easier
+
+
+};
 function translate(x, y) {
   return 'translate(' + x + ',' + y + ')';
 }
 
-};
+
+/*
+Contributions
+https://bl.ocks.org/d3noob/ddd7129c4486085937eb28da0d22a240
+
+*/
