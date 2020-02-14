@@ -236,18 +236,7 @@ You can even put code into these pre blocks.
         <script src="config1.js"> </script>
 
         <!-- Here is out core javascript -->
-        <script type="text/javascript">
-         console.log("Right before parsing")
-        airData = d3.csv("Air_Traffic_Passenger_Statistics.csv", parseData)
-        .then(function(data) {
-          //console.log("Here is airData: ", airData);
-          // parse data
-          //var myParsedData = parseData(data)
-          // now graph
-          drawLineGraph(data);
-        });
-
-        </script>
+        <svg id = "lines"></svg>
 
 
         <h4>Instructions</h4>
